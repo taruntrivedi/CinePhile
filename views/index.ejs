@@ -1,0 +1,23 @@
+<% include ./partials/header %>
+
+
+<h1>this is the landing page</h1>
+
+<% contents.forEach(function(content){ %>
+
+
+<h2> <%= content.title %></h2>
+<span>
+    <%= content.created %>
+</span>
+<p> <%- content.body.substring(0, 75) %>...</p>
+
+<a href="/post/<%=content._id%>">read more</a>
+
+
+
+
+
+<% }) %>
+
+<% include ./partials/footer %>

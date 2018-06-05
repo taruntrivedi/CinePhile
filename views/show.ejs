@@ -1,0 +1,17 @@
+
+<% include ./partials/header %>
+
+<h2><%=foundPost.title%></h2>
+<span><%=foundPost.created%></span>
+<p><%-foundPost.body%></p>
+
+<form action="/post/<%=foundPost._id%>?_method=DELETE" method="POST">
+<button>Delete</button>
+</form>
+
+<form action="/post/<%=foundPost._id%>/edit" method="GET">
+<button>Edit</button>
+</form>
+
+
+<% include ./partials/footer %>
