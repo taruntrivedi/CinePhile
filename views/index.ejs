@@ -3,6 +3,14 @@
 
 <h1>this is the landing page</h1>
 
+
+
+<a href="/signup">SignUP!</a>
+<a href="/login">login</a>
+<a href="/logout">logout</a>
+
+
+
 <% contents.forEach(function(content){ %>
 
 
@@ -14,10 +22,8 @@
 
 <a href="/post/<%=content._id%>">read more</a>
 
-
-
-
-
 <% }) %>
+
+
 
 <% include ./partials/footer %>

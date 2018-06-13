@@ -1,0 +1,21 @@
+<% include ./partials/header %>
+
+    <h2>
+        <%=foundPost.title%>
+    </h2>
+    <span>
+        <%=foundPost.created%>
+    </span>
+    <p>
+        <%-foundPost.body%>
+    </p>
+
+<form action="/post/<%=foundPost._id%>/comment" method="POST">
+
+    <input type="text" name="comment[text]" placeholder="thoughts here">
+    <input type="submit">
+</form>
+
+   
+
+    <% include ./partials/footer %>

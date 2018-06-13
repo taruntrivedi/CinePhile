@@ -13,5 +13,12 @@
 <button>Edit</button>
 </form>
 
+<a href="/post/<%=foundPost._id%>/comment/new">add comment</a>
+
+<% foundPost.comments.forEach(function(comment){ %>
+<p> <%=comment.text %></p>
+<% }) %>
+
+
 
 <% include ./partials/footer %>

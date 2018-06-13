@@ -1,7 +1,10 @@
 var express = require("express"),
     mongoose= require("mongoose"),
-    bodyParser= require("body-parser");
-    methodOverride= require("method-override");
+    passport= require("passport"),
+    localStrategy= require("passport-local"),
+    passportLocalMongoose= require("passport-local-mongoose"),
+    bodyParser= require("body-parser"),
+    methodOverride= require("method-override")
 
 var app = express();
 
@@ -12,15 +15,24 @@ mongoose.connect("mongodb://localhost/cinephile");
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended:true}));
-app.use(methodOverride("_method"));  
+app.use(methodOverride("_method"));
 
-var contentSchema = new mongoose.Schema({
-    title:String,
-    body:String,
-    created:{type:Date, default:Date.now}
-})
+var User = require("./models/user");
+var content = require("./models/content");
+var comment = require("./models/comment");
 
-var content = mongoose.model("Content",contentSchema);
+
+app.use(require("express-session")({
+    secret: "this is the secret CIA",
+    resave: true,
+    saveUninitialized: false
+}))
+app.use(passport.initialize());
+app.use(passport.session());
+
+passport.use(new localStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 //hardcoded data
 // content.create({
@@ -64,20 +76,20 @@ app.post("/", function(req,res){
      else{
          res.redirect("/");
      }
- })
+ });
 });
 
 //show route
 app.get("/post/:id",function(req,res){
-   content.findById(req.params.id, function(err,foundPost){
+    content.findById(req.params.id).populate("comments").exec (function(err,foundPost){
        if(err){
-           res.redirect("/")
+           res.redirect("/");
        }
        else{
-           res.render("show",{foundPost:foundPost})
+           res.render("show",{foundPost:foundPost});
        }
-   }) 
-})
+   }) ;
+});
 
 //delete route
 app.delete("/post/:id", function(req,res){
@@ -88,8 +100,8 @@ app.delete("/post/:id", function(req,res){
         else{
             res.redirect("/");
         }
-    })
-})
+    });
+});
 
 //edit route
 app.get("/post/:id/edit", function(req,res){
@@ -106,7 +118,7 @@ content.findById(req.params.id, function(err,foundpost){
 
 //update route
 app.put("/post/:id",function(req,res){
-    content.findByIdAndUpdate(req.params.id,req.body.content, function(err,){
+    content.findByIdAndUpdate(req.params.id,req.body.content, function(err){
         if(err){
             res.redirect("post/:id/edit")
         }
@@ -117,15 +129,92 @@ app.put("/post/:id",function(req,res){
 })
 
 
+//comments routes
 
+//new
+
+app.get("/post/:id/comment/new",function(req,res){
+content.findById(req.params.id,function(err,foundPost){
+    if(err){
+        console.log(err);
+    }
+    else{
+       res.render("new_comment",{foundPost:foundPost});
+    }
+})
+
+});
+
+app.post("/post/:id/comment",function(req,res){
+    content.findById(req.params.id,function(err,foundPost){
+        if(err){
+            console.log(err);
+        }
+        else{
+          comment.create(req.body.comment, function(err,comment){
+          if(err){
+              console.log(err);
+          }
+          else{
+              //add username and id in comment mode
+
+             //save comment
+             comment.save();
+             foundPost.comments.push(comment);
+             foundPost.save();
+             res.redirect("/post/"+ foundPost._id);
+
+
+          }
+
+          });
+        }
+    });
+});
+
+//
 
 //auth routes
-app.get("/login", function(req,res){
+
+//signup
+app.get("/signup", function (req, res) {
+    res.render("signup");
+})
+
+app.post("/signup", function(req,res){
+  User.register(new User({username:req.body.username}),req.body.password, function(err,user){
+      if(err){
+          console.log(err);
+          return res.render("signup");
+      }
+      
+          passport.authenticate("local")(req,res,function(){
+              res.redirect("/");
+          })
+      
+  })  
+})
+
+
+//login
+app.get("/login", function (req, res) {
     res.render("login");
 })
 
-app.get("/signup", function (req, res) {
-    res.render("signup");
+app.post("/login",passport.authenticate("local",{
+    successRedirect:"/",
+    faliureRedirect:"/login"
+}),
+function(req,res){
+
+});
+
+//logout
+
+app.get("/logout", function(req,res){
+    req.logout();
+    res.redirect("/");
+
 })
 
 
