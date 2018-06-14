@@ -1,0 +1,21 @@
+<% include ./partials/header %>
+
+    <h2>
+        <%=foundPost.title%>
+    </h2>
+    <span>
+        <%=foundPost.created%>
+    </span>
+    <p>
+        <%-foundPost.body%>
+    </p>
+
+<form action="/post/<%=foundPost._id%>/comment/<%=comment._id%>?_method=PUT" method="POST">
+
+        <input type="text" name="comment[text]" value="<%= comment.text %>">
+        <input type="submit">
+    </form>
+
+
+
+    <% include ./partials/footer %>

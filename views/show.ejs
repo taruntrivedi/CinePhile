@@ -16,8 +16,21 @@
 <a href="/post/<%=foundPost._id%>/comment/new">add comment</a>
 
 <% foundPost.comments.forEach(function(comment){ %>
-<p> <%=comment.text %></p>
+<p>
+    <strong><%= comment.author.username %></strong>: <%=comment.text %>
+   
+</p>
+    
+
+<form action="/post/<%=foundPost._id%>/comment/<%=comment._id%>?_method=DELETE" method="POST">
+    <button>Delete comment</button>
+</form>
+
+<form action="/post/<%=foundPost._id%>/comment/<%=comment._id%>/edit" method="GET">
+    <button>Edit comment</button>
+</form>
 <% }) %>
+
 
 
 

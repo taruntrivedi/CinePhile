@@ -4,14 +4,15 @@ var express = require("express"),
     localStrategy= require("passport-local"),
     passportLocalMongoose= require("passport-local-mongoose"),
     bodyParser= require("body-parser"),
-    methodOverride= require("method-override")
+    methodOverride= require("method-override"),
+     flash= require("connect-flash")
 
 var app = express();
 
 
 mongoose.connect("mongodb://localhost/cinephile");
 
-
+app.use(flash());
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended:true}));
@@ -21,6 +22,7 @@ var User = require("./models/user");
 var content = require("./models/content");
 var comment = require("./models/comment");
 
+var middleware = require("./middleware/index.js");
 
 app.use(require("express-session")({
     secret: "this is the secret CIA",
@@ -33,6 +35,15 @@ app.use(passport.session());
 passport.use(new localStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+
+app.use(function (req, res, next) {
+    res.locals.currentUser = req.user;
+    res.locals.error = req.flash("error");
+    res.locals.success = req.flash("success");
+    next();
+
+});
+
 
 //hardcoded data
 // content.create({
@@ -62,14 +73,22 @@ app.get("/", function(req,res){
 
 
 //new route
-app.get("/new", function (req, res) {
+app.get("/new",middleware.isLoggedIn, function (req, res) {
     res.render("new");
 });
 
 
 //create route
-app.post("/", function(req,res){
- content.create(req.body.content, function(err,newcontent){
+app.post("/",middleware.isLoggedIn, function(req,res){
+    var title = req.body.content.title;
+    var body = req.body.content.body;
+    var author = {
+        id: req.user._id,
+
+        username: req.user.username
+    };
+    var newlyContent= {title:title, body:body, author:author };
+ content.create(newlyContent, function(err,newcontent){
      if(err){
          console.log(err);
      }
@@ -92,7 +111,7 @@ app.get("/post/:id",function(req,res){
 });
 
 //delete route
-app.delete("/post/:id", function(req,res){
+app.delete("/post/:id",middleware.checkContentOwnership, function(req,res){
     content.findByIdAndRemove(req.params.id, function(err){
         if(err){
             res.redirect("/post/<%=content._id%>")
@@ -104,7 +123,7 @@ app.delete("/post/:id", function(req,res){
 });
 
 //edit route
-app.get("/post/:id/edit", function(req,res){
+app.get("/post/:id/edit", middleware.checkContentOwnership, function(req,res){
 content.findById(req.params.id, function(err,foundpost){
     if(err){
         res.redirect("/post/<%=content._id%>");
@@ -117,7 +136,7 @@ content.findById(req.params.id, function(err,foundpost){
 
 
 //update route
-app.put("/post/:id",function(req,res){
+app.put("/post/:id", middleware.checkContentOwnership, function (req, res) {
     content.findByIdAndUpdate(req.params.id,req.body.content, function(err){
         if(err){
             res.redirect("post/:id/edit")
@@ -131,9 +150,9 @@ app.put("/post/:id",function(req,res){
 
 //comments routes
 
-//new
+//new  and show comments
 
-app.get("/post/:id/comment/new",function(req,res){
+app.get("/post/:id/comment/new",middleware.isLoggedIn, function(req,res){
 content.findById(req.params.id,function(err,foundPost){
     if(err){
         console.log(err);
@@ -145,7 +164,7 @@ content.findById(req.params.id,function(err,foundPost){
 
 });
 
-app.post("/post/:id/comment",function(req,res){
+app.post("/post/:id/comment", middleware.isLoggedIn ,function(req,res){
     content.findById(req.params.id,function(err,foundPost){
         if(err){
             console.log(err);
@@ -157,7 +176,8 @@ app.post("/post/:id/comment",function(req,res){
           }
           else{
               //add username and id in comment mode
-
+              comment.author.id = req.user._id;
+              comment.author.username = req.user.username;
              //save comment
              comment.save();
              foundPost.comments.push(comment);
@@ -172,7 +192,58 @@ app.post("/post/:id/comment",function(req,res){
     });
 });
 
-//
+// edit and update comment
+
+app.get("/post/:id/comment/:comment_id/edit", middleware.checkCommentOwnership, function (req, res) {
+    comment.findById(req.params.comment_id,function(err, foundComment){
+      if(err){
+          console.log(err);
+      }
+      else{
+          content.findById(req.params.id, function(err,foundPost){
+              if(err){
+                 console.log(err)
+              }
+              else{
+               res.render("comment_edit", {
+                   foundPost: foundPost,
+                   comment: foundComment
+               });
+              }
+      });
+          
+      }
+    });
+});
+
+
+app.put("/post/:id/comment/:comment_id", middleware.checkCommentOwnership, function (req, res) {
+    comment.findByIdAndUpdate(req.params.comment_id, req.body.comment,function(err,updatedComment){
+     if(err){
+         console.log(err)
+     }
+     else{
+         res.redirect("/post/" + req.params.id);
+     }
+    }); 
+});
+
+//comment destroy
+
+app.delete("/post/:id/comment/:comment_id", middleware.checkCommentOwnership, function (req, res) {
+    comment.findByIdAndRemove(req.params.comment_id,function(err){
+          if(err){
+              console.log(err)
+          }
+          else{
+              res.redirect("/post/" + req.params.id);
+          }
+    
+});
+});
+
+
+
 
 //auth routes
 
@@ -216,6 +287,8 @@ app.get("/logout", function(req,res){
     res.redirect("/");
 
 })
+
+
 
 
 
