@@ -32,6 +32,7 @@ router.get("/new", middleware.isLoggedIn, function (req, res) {
 router.post("/", middleware.isLoggedIn, function (req, res) {
     var title = req.body.content.title;
     var body = req.body.content.body;
+    var image= req.body.content.image;
     var author = {
         id: req.user._id,
 
@@ -40,6 +41,7 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
     var newlyContent = {
         title: title,
         body: body,
+        image:image,
         author: author
     };
     content.create(newlyContent, function (err, newcontent) {

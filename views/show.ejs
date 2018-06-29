@@ -1,37 +1,77 @@
 
 <% include ./partials/header %>
 
-<h2><%=foundPost.title%></h2>
-<span><%=foundPost.created%></span>
+<div class="container">
+<div class ="row">
+<div class="col-md-1"></div>
+<div class ="col-md-10">
+
+    <div class ="thumbnail">
+        <img class ="img-responsive" src ="<%=foundPost.image%>">
+  <div class ="caption">
+<h4 class ="pull right">
+    <%=foundPost.created.toDateString() %>
+</h4>
+<h4><a><%=foundPost.title%></a></h4>
+
 <p><%-foundPost.body%></p>
+<p><em>submitted by
+    <%= foundPost.author.username %>
+</em>
+</p>
+<%if(currentUser && foundPost.author.id.equals(currentUser._id)){%>
 
-<form action="/post/<%=foundPost._id%>?_method=DELETE" method="POST">
-<button>Delete</button>
+
+
+<form class="delform" action="/post/<%=foundPost._id%>/edit" method="GET">
+<button class="btn-sm btn-warning">Edit</button>
 </form>
 
-<form action="/post/<%=foundPost._id%>/edit" method="GET">
-<button>Edit</button>
+<form class="delform" action="/post/<%=foundPost._id%>?_method=DELETE" method="POST">
+<button class="btn-sm btn-danger">Delete</button>
 </form>
 
-<a href="/post/<%=foundPost._id%>/comment/new">add comment</a>
+
+<% } %>
+</div>
+</div>
+
+<div class ="well">
+<div class="text-right">
+<a class="btn btn-success" href="/post/<%=foundPost._id%>/comment/new">Add New Comment</a>
+</div>
+<hr>
+
 
 <% foundPost.comments.forEach(function(comment){ %>
-<p>
-    <strong><%= comment.author.username %></strong>: <%=comment.text %>
+<div class ="row">
+    <div class ="col-md-12">
+    <strong><%= comment.author.username %></strong>
+    <P>
+    <%=comment.text %>
+    </P>
+<%if(currentUser && comment.author.id.equals(currentUser._id)){%>
    
-</p>
+   
     
-
-<form action="/post/<%=foundPost._id%>/comment/<%=comment._id%>?_method=DELETE" method="POST">
-    <button>Delete comment</button>
+<form class="delform" action="/post/<%=foundPost._id%>/comment/<%=comment._id%>/edit" method="GET">
+    <button class="btn-sm btn-warning">Edit</button>
+</form>
+<form class="delform" action="/post/<%=foundPost._id%>/comment/<%=comment._id%>?_method=DELETE" method="POST">
+<button class="btn-sm btn-danger">Delete</button>
 </form>
 
-<form action="/post/<%=foundPost._id%>/comment/<%=comment._id%>/edit" method="GET">
-    <button>Edit comment</button>
-</form>
+
+<% } %>
+    </div>
+    </div>
 <% }) %>
 
+</div>
+</div>
 
-
+<div class="col-md-1"></div>
+</div>
+</div>
 
 <% include ./partials/footer %>

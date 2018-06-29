@@ -1,12 +1,29 @@
 <% include ./partials/header %>
 
+    <div class="container">
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
+                <h1 class="text-center">New Post</h1>
 
-<h1>this is the new blog page</h1>
+                <form action="/" method="POST">
 
-<form action="/" method="POST"> 
-<input type="text" name="content[title]" placeholder="title">
-<textarea  name="content[body]" cols="30" rows="10" placeholder="thoughts here"></textarea>
-<input type="submit">
-</form>
+                    <div class="form-row">
+                        <div class="col">
+                            <input type="text" class="form-control" name="content[title]" placeholder="title">
+                        </div>
+                        <div class="col">
+                            <input type="text" class="form-control" name="content[image]" placeholder="image url">
+                        </div>
+                    </div>
+                    <div class="editor">
+                    <textarea id="myTextarea" name="content[body]" cols="30" rows="10" placeholder="thoughts here"></textarea>
+                    </div>
+                 <button type="submit" class="btn btn-secondary btn-lg btn-block">submit</button>
+                </form>
+            </div>
 
-<% include ./partials/footer %>
+            <div class="col-md-1"></div>
+        </div>
+    </div>
+    <% include ./partials/footer %>

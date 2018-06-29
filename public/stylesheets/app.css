@@ -1,0 +1,24 @@
+.thumbnail img {
+    width: 100%;
+}
+
+.thumbnail {
+    padding: 0;
+}
+
+.delform {
+    display: inline;
+}
+.navbar{
+    margin-bottom: 20px;
+}
+
+.container{
+    margin-top: 100px;
+    margin-bottom: 100px;
+}
+
+.editor{
+    margin-top: 20px;
+    margin-bottom: 20px;
+}

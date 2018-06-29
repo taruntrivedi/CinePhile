@@ -1,21 +1,53 @@
+
+
 <% include ./partials/header %>
 
-    <h2>
-        <%=foundPost.title%>
-    </h2>
-    <span>
-        <%=foundPost.created%>
-    </span>
-    <p>
-        <%-foundPost.body%>
-    </p>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-1"></div>
+            <div class="col-md-10">
 
-<form action="/post/<%=foundPost._id%>/comment/<%=comment._id%>?_method=PUT" method="POST">
+                <div class="thumbnail">
+                    <img class="img-responsive" src="<%=foundPost.image%>">
+                    <div class="caption">
+                        <h4 class="pull right">
+                            <%=foundPost.created.toDateString() %>
+                        </h4>
+                        <h4>
+                            <a>
+                                <%=foundPost.title%>
+                            </a>
+                        </h4>
 
-        <input type="text" name="comment[text]" value="<%= comment.text %>">
-        <input type="submit">
-    </form>
+                        <p>
+                            <%-foundPost.body%>
+                        </p>
+                        <p>
+                            <em>submitted by
+                                <%= foundPost.author.username %>
+                            </em>
+                        </p>
+                    </div>
+                </div>
+                <!-- <form action="/post/<%=foundPost._id%>/comment" method="POST">
 
+    <input type="text" name="comment[text]" placeholder="thoughts here">
+    <input type="submit">
+</form> -->
+                <div class="well">
+<form class="form-inline" action="/post/<%=foundPost._id%>/comment/<%=comment._id%>?_method=PUT" method="POST">
+                        <div class="form-group mx-sm-3 mb-2">
+                            <label for="inputPassword2" class="sr-only">comment</label>
+<input type="text" class="form-control" id="inputPassword2" name="comment[text]" value="<%= comment.text %>">
+                        </div>
+                        <button type="submit" class="btn btn-primary mb-2">submit</button>
+                    </form>
 
+                </div>
+            </div>
+
+            <div class="col-md-1"></div>
+        </div>
+    </div>
 
     <% include ./partials/footer %>

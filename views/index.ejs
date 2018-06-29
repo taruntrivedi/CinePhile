@@ -1,29 +1,38 @@
 <% include ./partials/header %>
+    <link rel="stylesheet" href="/stylesheets/app.css">
 
 
-<h1>this is the landing page</h1>
+<div class="container">
 
 
+<div class="card-deck">
+<diV class="row " >
+ <% contents.forEach(function(content){ %>
 
-<a href="/signup">SignUP!</a>
-<a href="/login">login</a>
-<a href="/logout">logout</a>
+<div class="col-md-3 col -sm-6">
+<div class="card text-center">
+<img class="card-img-top" src="<%= content.image %>" alt="Card image cap">
+        <div class="card-body">
+            <h5 class="card-title"><%= content.title %></h5>
+            <p class="card-text"><%-content.body.substring(3, 80) %>...</p>
+            <a href="/post/<%=content._id%>" class="btn btn-primary">Read more</a>
+        </div>
+    </div>
+               
+        <!-- <h2>
+            <%= content.title %>
+        </h2>
+        <span>
+            <%= content.created %>
+        </span>
+        <p>
+            <%- content.body.substring(0, 75) %>...</p>
 
+        <a href="/post/<%=content._id%>">read more</a> -->
+       </div>
+        <% }) %>
+</div>
 
-
-<% contents.forEach(function(content){ %>
-
-
-<h2> <%= content.title %></h2>
-<span>
-    <%= content.created %>
-</span>
-<p> <%- content.body.substring(0, 75) %>...</p>
-
-<a href="/post/<%=content._id%>">read more</a>
-
-<% }) %>
-
-
+</div>
 
 <% include ./partials/footer %>

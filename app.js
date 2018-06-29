@@ -5,7 +5,7 @@ var express = require("express"),
     passportLocalMongoose= require("passport-local-mongoose"),
     bodyParser= require("body-parser"),
     methodOverride= require("method-override"),
-     flash= require("connect-flash")
+     flash= require("connect-flash");
 
 var app = express();
 
@@ -18,7 +18,7 @@ app.use(require("express-session")({
     secret: "this is the secret CIA",
     resave: true,
     saveUninitialized: false
-}))
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -61,7 +61,6 @@ var middleware = require("./middleware/index.js");
 
 
 
-
 //hardcoded data
 // content.create({
 //   title:"hello world",
@@ -71,4 +70,4 @@ var middleware = require("./middleware/index.js");
 
 app.listen(process.env.PORT||3000,process.env.IP, function(){
     console.log("cinephile server has started");
-})
+});
